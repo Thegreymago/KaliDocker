@@ -1,0 +1,29 @@
+version: '3'
+
+#NETWORK
+networks:
+  network:
+    driver: bridge
+    name: network
+
+#VOLUME
+volumes:
+  doc:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/Jo/Documents
+
+services:
+  ubuntu:
+    build:
+      context: ./ubuntu/
+      dockerfile: Dockerfile
+    image: ubuntu
+    container_name: ubuntu
+    volumes:      
+      - doc:/root
+    networks: 
+      - network
+    restart: always
