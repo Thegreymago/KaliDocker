@@ -1,30 +1,41 @@
-NAME = ubuntu
+NAME = kali
+
+NAME_EPHEMERAL = kali_ephemeral
+
+DIRECTORY = ./kali
+
+IMAGE_NAME = kali:vJO
+
+PATH_LOCAL = /Users/Jo/Documents
 
 all:
-	docker compose -f ./docker-compose.yml up --build -d
-	docker exec -it ubuntu zsh 	
+	docker build -t $(IMAGE_NAME) $(DIRECTORY)
+	docker run -it --name $(NAME) -v $(PATH_LOCAL):/data -w /data $(IMAGE_NAME)
 
 re: clean all
 
-exec:
-	docker exec -it ubuntu zsh
+ephemeral:
+	docker run -it --rm --name $(NAME) -v $(PATH_LOCAL):/data -w /data $(IMAGE_NAME)
 
-build:
-	docker compose -f ./docker-compose.yml build
+in: start
+	docker attach $(NAME)
 
-down:
-	docker compose -f ./docker-compose.yml down
+stop:
+	docker stop $(NAME)
+
+start:
+	docker start $(NAME)
 
 run:
-	docker compose -f ./docker-compose.yml up
+	docker run -it --name $(NAME) -v $(PATH_LOCAL):/data -w /data $(IMAGE_NAME)
 
-rerun: rebuild run
+clean:
+	docker rm $(NAME)
 
-rebuild: clean build
+fclean: clean
+	docker rmi $(docker image ls -q)
 
-clean: down
-
-prune: 	
+prune:
 	docker system prune -a -f
 
-.PHONY: all re build down run rerun rebuild clean prune exec
+.PHONY: all re build down run clean fclean prune in
